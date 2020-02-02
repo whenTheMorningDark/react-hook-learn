@@ -33,6 +33,7 @@ export function setIsLoadingCityData(isLoadingCityData) {
 }
 
 export function setCityData(cityDate) {
+  console.log(cityDate)
   return {
     type: ACTION_SET_CITY_DATA,
     payload: cityDate
@@ -105,5 +106,33 @@ export function exchangeFromTo() {
     } = getState();
     dispatch(setFrom(to));
     dispatch(setTo(from));
+  }
+}
+export function fetchCityData() {
+  return (dispatch, getState) => {
+    console.log("asd")
+    const {
+      isLoadingCityData
+    } = getState();
+    if (isLoadingCityData) {
+      return;
+    }
+    const cache = JSON.parse(localStorage.getItem("city_data_cache") || "{}")
+    if (Date.now() < cache.expires) {
+      dispatch(setCityData(cache.data))
+      return;
+    }
+    dispatch(setIsLoadingCityData(true));
+    fetch("/rest/cities?_" + Date.now()).then(res => res.json()).then(cityData => {
+        dispatch(setCityData(cityData))
+        localStorage.setItem("city_data_cache", JSON.stringify({
+          expires: Date.now() + 60 * 1000,
+          data: cityData
+        }))
+        dispatch(setIsLoadingCityData(false))
+      })
+      .catch(err => {
+        dispatch(setIsLoadingCityData(false))
+      })
   }
 }
