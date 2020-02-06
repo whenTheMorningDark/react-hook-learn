@@ -15,30 +15,38 @@ import {
   setDepartDate,
   setHighSpeed,
   setSearchParsed,
-
   setTrainList,
   setTicketTypes,
   setTrainTypes,
   setDepartStations,
   setArriveStations,
-
   prevDate,
   nextDate,
-
   toggleOrderType,
   toggleHighSpeed,
   toggleOnlyTickets,
-  toggleIsFiltersVisible
+  toggleIsFiltersVisible,
+
+  setCheckedTicketTypes,
+  setCheckedTrainTypes,
+  setCheckedDepartStations,
+  setCheckedArriveStations,
+  setDepartTimeStart,
+  setDepartTimeEnd,
+  setArriveTimeStart,
+  setArriveTimeEnd
 } from "./actions"
 function App (props) {
   const {
+    trainList,
     from,
     to,
-    dispatch,
+    departDate,
+    highSpeed,
     searchParsed,
+    dispatch,
     orderType,
     onlyTickets,
-    departDate,
     isFiltersVisible,
     ticketTypes,
     trainTypes,
@@ -52,8 +60,6 @@ function App (props) {
     departTimeEnd,
     arriveTimeStart,
     arriveTimeEnd,
-    highSpeed,
-    trainList
   } = props
   useEffect(() => {
     const queries = URI.parseQuery(window.location.search)
@@ -162,7 +168,15 @@ function App (props) {
       toggleOrderType,
       toggleHighSpeed,
       toggleOnlyTickets,
-      toggleIsFiltersVisible
+      toggleIsFiltersVisible,
+      setCheckedTicketTypes,
+      setCheckedTrainTypes,
+      setCheckedDepartStations,
+      setCheckedArriveStations,
+      setDepartTimeStart,
+      setDepartTimeEnd,
+      setArriveTimeStart,
+      setArriveTimeEnd
     }, dispatch)
   }, [dispatch])
 
@@ -183,11 +197,24 @@ function App (props) {
         next={next}
       ></Nav>
       <List list={trainList}></List>
+
       <Bottom
         highSpeed={highSpeed}
         orderType={orderType}
         onlyTickets={onlyTickets}
         isFiltersVisible={isFiltersVisible}
+        ticketTypes={ticketTypes}
+        trainTypes={trainTypes}
+        departStations={departStations}
+        arriveStations={arriveStations}
+        checkedTicketTypes={checkedTicketTypes}
+        checkedTrainTypes={checkedTrainTypes}
+        checkedDepartStations={checkedDepartStations}
+        checkedArriveStations={checkedArriveStations}
+        departTimeStart={departTimeStart}
+        departTimeEnd={departTimeEnd}
+        arriveTimeStart={arriveTimeStart}
+        arriveTimeEnd={arriveTimeEnd}
         {...bottomCbs}
       ></Bottom>
     </div>
