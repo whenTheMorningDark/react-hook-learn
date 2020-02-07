@@ -18,6 +18,8 @@ const Slider = memo(function Slider (props) {
   const range = useRef();
   const rangeWidth = useRef();
 
+  const prevCurrentStartHours = useRef(currentStartHours)
+  const prevCurrentEndHours = useRef(currentEndHours)
   const winSize = useWinSize();
 
   const [start, setStart] = useState(() => {
@@ -26,6 +28,18 @@ const Slider = memo(function Slider (props) {
   const [end, setEnd] = useState(() => {
     return currentEndHours / 24 * 100
   });
+  // if (prevCurrentEndHours.current !== prevCurrentEndHours) {
+  //   setStart(currentEndHours / 24 * 100)
+  //   prevCurrentEndHours.current = currentEndHours
+  // }
+  if (prevCurrentStartHours.current !== currentStartHours) {
+    setStart(currentStartHours / 24 * 100)
+    prevCurrentStartHours.current = currentStartHours
+  }
+  if (prevCurrentEndHours.current !== currentEndHours) {
+    setEnd(currentEndHours / 24 * 100)
+    prevCurrentEndHours.current = currentEndHours
+  }
   const startPercent = useMemo(() => {
     if (start > 100) {
       return 100;
