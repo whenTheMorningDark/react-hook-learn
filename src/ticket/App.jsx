@@ -1,5 +1,5 @@
 import React, {
-  useEffect, useCallback
+  useEffect, useCallback, useMemo, lazy, Suspense
 } from 'react'
 import "./App.css";
 import URI from "urijs"
@@ -10,12 +10,10 @@ import Header from "../common/Header";
 import Nav from "../common/Nav"
 import Detail from "../common/Detail";
 import Candidate from "./Candidate"
-import Schedule from "./Schedule"
-import useNav from "../common/useNav"
-// dispatch(setArriveTimeStr(arriveTimeStr));
-//         dispatch(setArriveDate(arriveDate));
-//         dispatch(setDurationStr(durationStr));
-//         dispatch(setTickets(candidates));
+// import Schedule from "./Schedule"
+import useNav from "../common/useNav";
+import { bindActionCreators } from "redux"
+import { TrainContext } from "./context"
 import {
   setDepartStation,
   setArriveStation,
@@ -28,8 +26,13 @@ import {
   setArriveTimeStr,
   setArriveDate,
   setDurationStr,
-  setTickets
+  setTickets,
+
+  toggleIsScheduleVisible
 } from "./actions"
+
+const Schedule = lazy(() => import("./Schedule"))
+
 function App (props) {
   const {
     departDate,
@@ -43,7 +46,8 @@ function App (props) {
     tickets,
     isScheduleVisible,
     searchParsed,
-    dispatch,
+    dispatch
+    // toggleIsScheduleVisible
   } = props;
 
   const onBack = useCallback(() => {
@@ -106,6 +110,13 @@ function App (props) {
 
   }, [departDate, dispatch, searchParsed, trainNumber])
 
+  const detailCbs = useMemo(() => {
+    return bindActionCreators({
+      toggleIsScheduleVisible
+    }, dispatch)
+  }, [dispatch])
+
+
   if (!searchParsed) {
     return null;
   }
@@ -123,6 +134,36 @@ function App (props) {
             next={next}
           />
         </div>
+        <div className="detail-wrapper" style={{ paddingTop: 50 + 'px' }}>
+          <Detail
+            departDate={departDate}
+            arriveDate={arriveDate}
+            departTimeStr={departTimeStr}
+            arriveTimeStr={arriveTimeStr}
+            trainNumber={trainNumber}
+            departStation={departStation}
+            arriveStation={arriveStation}
+            durationStr={durationStr}
+            {
+            ...detailCbs
+            }
+          />
+        </div>
+        <TrainContext.Provider value={{ trainNumber, departStation, arriveStation, departDate }}>
+          <Candidate tickets={tickets}></Candidate>
+        </TrainContext.Provider>
+        {
+          isScheduleVisible && <div className="mask" onClick={() => dispatch(toggleIsScheduleVisible())}>
+            <Suspense fallback={<div>loading</div>}>
+              <Schedule
+                date={departDate}
+                trainNumber={trainNumber}
+                departStation={departStation}
+                arriveStation={arriveStation}
+              />
+            </Suspense>
+          </div>
+        }
       </div>
     </div>
   )
